@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 
-// "capacity" and "price" fields should return formatted text
-
 const roomSchema = new mongoose.Schema(
 	{
+		// id is int in API specification, but I guess mongodb string will be ok?
 		number: {
-			type: number,
-			required: [true, "required room number"],
+			type: Number,
+			required: [true, "room number is required"],
 			unique: true,
 		},
 		capacity: {
@@ -41,6 +40,10 @@ const roomSchema = new mongoose.Schema(
 	}
 );
 
+// roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", localField: "_id" });
+
 const Room = mongoose.model("Room", roomSchema);
+
+//seems like Mongoose automatically pluralizes db collection name
 
 module.exports = Room;

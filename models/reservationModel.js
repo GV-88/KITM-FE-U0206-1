@@ -1,17 +1,6 @@
 const mongoose = require("mongoose");
-
-const today = () => {
-	const now = new Date();
-	return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-};
-
-const addDays = (days) => {
-	return new Date(today.valueOf() + days * 1000 * 60 * 60 * 24);
-};
-
-//TODO: required fields
-//TODO: validate date range
-//TODO: auto-generate code?
+// const dayjs = require("dayjs");
+const { generateCode } = require("../utilities/helpers");
 
 const reservationSchema = new mongoose.Schema({
 	room: {
@@ -21,16 +10,45 @@ const reservationSchema = new mongoose.Schema({
 	},
 	code: {
 		type: String,
-		required: [true, "required reservation code"],
+		required: [true, "reservation code is required"],
 		unique: true,
+		default: generateCode(10), //when will this function be called? //also, should we ensure unique in db with retry loop?
 	},
-	name: String,
-	address: String,
-	city: String,
-	zip: String,
-	country: String,
-	checkin: Date,
-	checkout: Date,
+	name: {
+		type: String,
+		required: [true, "reservation name is required"],
+	},
+	address: {
+		type: String,
+		required: [true, "address is required"],
+	},
+	city: {
+		type: String,
+		required: [true, "city is required"],
+	},
+	zip: {
+		type: String,
+		required: [true, "zip code is required"],
+	},
+	country: {
+		type: String,
+		required: [true, "country is required"],
+	},
+	checkin: {
+		type: Date,
+		required: [true, "checkin date is required"],
+		// might also validate for future dates, but who says you cannot log reservations retroactively?
+	},
+	checkout: {
+		type: Date,
+		required: [true, "checkout date is required"],
+		validate: {
+			validator: function (val) {
+				return val >= this.checkin;
+			},
+			message: "checkout date cannot be before checkin",
+		},
+	},
 	created_at: {
 		type: Date,
 		default: Date.now(),
