@@ -12,29 +12,23 @@ const formatRoomResponse = (roomData) => {
 	return res;
 };
 
-exports.getAllRooms = async (req, res) => {
+exports.getRooms = async (req, res) => {
 	try {
-		let rooms = await Room.find().sort("number"); //API spec says sort by name, there is no such field???
+		let rooms = [];
+		const roomId = req.params["room_id"];
+		if (roomId) {
+			rooms = [await Room.findById(roomId)];
+			if (rooms && rooms[0] === null) {
+				throw Error("A room with this ID does not exist");
+			}
+		} else {
+			rooms = await Room.find().sort("number"); //API spec says sort by name, there is no such field???
+		}
 		rooms = rooms.map((room) => formatRoomResponse(room));
 		res.status(200).json({ rooms });
 	} catch (error) {
-		console.log(error);
-
 		res.status(404).json({
-			error: error,
-		});
-	}
-};
-
-//API spec describes single room response body in array form, is that by design?
-
-exports.getSingleRoom = async (req, res) => {
-	try {
-		const room = formatRoomResponse(await Room.findById(req.params["room_id"]));
-		res.status(200).json({ room });
-	} catch (error) {
-		res.status(404).json({
-			error: "A room with this ID does not exist",
+			error: error.message,
 		});
 	}
 };
