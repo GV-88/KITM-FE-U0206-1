@@ -5,7 +5,10 @@ const formatRoomResponse = (roomData) => {
 	delete res._id;
 	res.capacity = `${roomData.capacity} bed${roomData.capacity > 1 ? "s" : ""}`;
 	res.price = `${roomData.price} Eur`;
-	// res.reservations =
+	res.reservations = roomData.reservations.map((i) => Object.assign({ id: i._id.toString() }, i._doc));
+	res.reservations.forEach((i) => {
+		delete i._id;
+	});
 	return res;
 };
 
