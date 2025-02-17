@@ -48,18 +48,15 @@ exports.getReservations = async (req, res) => {
 	const name = req.body?.name;
 	const code = req.body?.code;
 	try {
-		// seems that code is required, according to API spec
-		// but not exactly clear if the code should be used for filtering,
-		//  or any matching code is enough to access all reservations with the same name?
-		// the latter seems illogical because the name can coincide for different clients;
-		// but then again, what would be the point of listing multiple reservations if only one code matches?
 		/*
 			API spec: "Users can specify their name and one of the reservation codes.
 				If the name is correct, all reservation are returned."
 			This would maybe make sense if name was unique,
 				because otherwise with one of my own codes I could possibly access someone else's codes;
 				But it cannot be unique because the listing wouldn't work
-			HOW DOES IT WORK???
+
+			Rethinking: store reservations as subdocs in hotelClient docs;
+				then hotelClient gets identified by a composite key (name + one of the codes)
 		*/
 		let reservations = await Reservation.find({ name: name, code: code }).sort("checkin");
 		reservations = reservations.map((reservation) => formatReservationResponse(reservation));
