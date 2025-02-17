@@ -30,8 +30,6 @@ exports.getAllRooms = async (req, res) => {
 
 exports.getSingleRoom = async (req, res) => {
 	try {
-		console.log(req.params);
-
 		const room = formatRoomResponse(await Room.findById(req.params["room_id"]));
 		res.status(200).json({ room });
 	} catch (error) {
