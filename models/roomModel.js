@@ -50,10 +50,10 @@ roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", l
 
 // circular reference if attempting to populate both rooms and reservations
 roomSchema.pre(/^find/, function (next) {
-	// this.populate({
-	// 	path: "reservations",
-	// 	select: "_id checkin checkout -created_at",
-	// });
+	this.populate({
+		path: "reservations",
+		select: "_id checkin checkout -created_at -room",
+	});
 	next();
 });
 

@@ -5,6 +5,7 @@ const formatRoomResponse = (roomData) => {
 	delete res._id;
 	res.capacity = `${roomData.capacity} bed${roomData.capacity > 1 ? "s" : ""}`;
 	res.price = `${roomData.price} Eur`;
+	// res.reservations =
 	return res;
 };
 
