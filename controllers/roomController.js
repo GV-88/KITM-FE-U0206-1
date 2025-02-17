@@ -13,16 +13,24 @@ const formatRoomResponse = (roomData) => {
 };
 
 exports.getRooms = async (req, res) => {
+	//really this should be defined in model statics (but I cannot get it to work)
+	async function populateReservations(obj) {
+		return obj.populate({
+			path: "reservations",
+			select: "_id checkin checkout -created_at -room",
+		});
+	}
+
 	try {
 		let rooms = [];
 		const roomId = req.params["room_id"];
 		if (roomId) {
-			rooms = [await Room.findById(roomId)];
+			rooms = [await populateReservations(Room.findById(roomId))];
 			if (rooms && rooms[0] === null) {
 				throw Error("A room with this ID does not exist");
 			}
 		} else {
-			rooms = await Room.find().sort("number"); //API spec says sort by name, there is no such field???
+			rooms = await populateReservations(Room.find()).sort("number"); //API spec says sort by name, there is no such field???
 		}
 		rooms = rooms.map((room) => formatRoomResponse(room));
 		res.status(200).json({ rooms });

@@ -84,13 +84,13 @@ const reservationSchema = new mongoose.Schema(
 	}
 );
 
-// circular reference if attempting to populate both rooms and reservations
 reservationSchema.pre(/^find/, function (next) {
-	// this.populate({
-	// 	path: "room",
-	// 	select: "number", // need _id field for populating, but not for display
-	// 	// cannot exclude virtual "reservations"???
-	// });
+	this.populate({
+		path: "room",
+		select: "number", // need _id field for populating, but not for display
+		//select: "-reservations",
+		// cannot exclude virtual "reservations"???
+	});
 	next();
 });
 

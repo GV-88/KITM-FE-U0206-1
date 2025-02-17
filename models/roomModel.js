@@ -48,13 +48,12 @@ const roomSchema = new mongoose.Schema(
 
 roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", localField: "_id" });
 
-// circular reference if attempting to populate both rooms and reservations
-roomSchema.pre(/^find/, function (next) {
-	this.populate({
+roomSchema.static("populateReservations", function () {
+	//returns self (chainable)
+	return this.populate({
 		path: "reservations",
 		select: "_id checkin checkout -created_at -room",
 	});
-	next();
 });
 
 const Room = mongoose.model("Room", roomSchema);
