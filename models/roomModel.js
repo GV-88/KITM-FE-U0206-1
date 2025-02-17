@@ -4,7 +4,7 @@ const roomSchema = new mongoose.Schema(
 	{
 		// id is int in API specification, but I guess mongodb string will be ok?
 		// _id: {
-		// 	type: mongoose.ObjectId,
+		// 	type: mongoose.Schema.Types.ObjectId,
 		// 	select: true,
 		// 	alias: "id",
 		// },
@@ -43,22 +43,16 @@ const roomSchema = new mongoose.Schema(
 	{
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
-		virtuals: {
-			// id: {
-			// 	get() {
-			// 		return this._id;
-			// 	},
-			// },
-			reservations: { ref: "Reservation", foreignField: "room", localField: "_id" },
-		},
 	}
 );
 
-//why won't this work???
+roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", localField: "_id" });
+
+// circular reference if attempting to populate both rooms and reservations
 roomSchema.pre(/^find/, function (next) {
 	// this.populate({
 	// 	path: "reservations",
-	// 	select: "room _id checkin checkout",
+	// 	select: "_id checkin checkout -created_at",
 	// });
 	next();
 });

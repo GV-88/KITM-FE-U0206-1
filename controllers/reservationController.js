@@ -1,4 +1,3 @@
-const { checkout } = require("../app");
 const Reservation = require("../models/reservationModel");
 const Room = require("../models/roomModel");
 const { generateCode } = require("../utilities/helpers");

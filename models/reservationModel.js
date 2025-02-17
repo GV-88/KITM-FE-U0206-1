@@ -9,7 +9,7 @@ const required = (fieldName = "{PATH}") => {
 const reservationSchema = new mongoose.Schema(
 	{
 		room: {
-			type: mongoose.Schema.ObjectId,
+			type: mongoose.Schema.Types.ObjectId,
 			ref: "Room",
 			required: [true, "specify room for reservation"],
 		},
@@ -84,6 +84,7 @@ const reservationSchema = new mongoose.Schema(
 	}
 );
 
+// circular reference if attempting to populate both rooms and reservations
 reservationSchema.pre(/^find/, function (next) {
 	this.populate({
 		path: "room",
