@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.route("/").get(roomController.getRooms);
 router.route("/:room_id").get(roomController.getRooms);
-router.route("/availability/checkin/:checkin_date/checkout/:checkout_date").get(reservationController.checkAvailability);
-router.route("/:room_id/reservation").post(/*reservationController.checkAvailability,*/ reservationController.createReservation);
+router.route("/availability/checkin/:checkin_date/checkout/:checkout_date").get(roomController.checkAvailability);
+router.route("/:room_id/reservation").post(/*roomController.checkAvailability,*/ reservationController.createReservation);
 
 module.exports = router;

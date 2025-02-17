@@ -40,3 +40,23 @@ exports.getRooms = async (req, res) => {
 		});
 	}
 };
+
+// this depends on room-reservation relation, cannot implement until virtuals are solved
+exports.checkAvailability = async (req, res, next) => {
+	try {
+		// objective: find rooms that do not have reservations with intersecting dates
+		// rooms without any reservations are clear
+		// will need at some point to populate reservations to then be able to filter rooms by dates
+		// mongoose docs: "Paths are populated after the query executes and a response is received"
+		// so it seems the narrowing won't be done entirely on db end, will have to download intermediary results
+
+		throw new Error("not implemented yet");
+		if (typeof next === "function") {
+			next();
+		}
+	} catch (error) {
+		res.status(400).json({
+			error: error.message,
+		});
+	}
+};

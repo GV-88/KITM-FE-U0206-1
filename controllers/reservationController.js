@@ -53,26 +53,20 @@ exports.getReservations = async (req, res) => {
 		//  or any matching code is enough to access all reservations with the same name?
 		// the latter seems illogical because the name can coincide for different clients;
 		// but then again, what would be the point of listing multiple reservations if only one code matches?
+		/*
+			API spec: "Users can specify their name and one of the reservation codes.
+				If the name is correct, all reservation are returned."
+			This would maybe make sense if name was unique,
+				because otherwise with one of my own codes I could possibly access someone else's codes;
+				But it cannot be unique because the listing wouldn't work
+			HOW DOES IT WORK???
+		*/
 		let reservations = await Reservation.find({ name: name, code: code }).sort("checkin");
 		reservations = reservations.map((reservation) => formatReservationResponse(reservation));
 		res.status(200).json({ reservations: reservations });
 	} catch (error) {
 		res.status(400).json({
 			error: error,
-		});
-	}
-};
-
-// this depends on room-reservation relation, cannot implement until virtuals are solved
-exports.checkAvailability = async (req, res, next) => {
-	try {
-		throw new Error("not implemented yet");
-		if (typeof next === "function") {
-			next();
-		}
-	} catch (error) {
-		res.status(400).json({
-			error: error.message,
 		});
 	}
 };
