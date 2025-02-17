@@ -5,3 +5,101 @@ GET http://localhost:8000/module-b/api/v1/rooms HTTP/1.1
 
 GET http://localhost:8000/module-b/api/v1/rooms/67ae138b899f504004c231db HTTP/1.1
 
+###
+
+GET http://localhost:8000/module-b/api/v1/rooms/availability/checkin/2022-05-11/checkout/2022-05-14 HTTP/1.1
+
+###
+
+POST http://localhost:8000/module-b/api/v1/rooms/67ae138b899f504004c231db/reservation HTTP/1.1
+content-type: application/json
+
+{
+    "checkin": "2022-05-10"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/rooms/67b27814899f504004c2b86c/reservation HTTP/1.1
+content-type: application/json
+
+{
+    "name": "John Doe",
+    "address": "Bees str. 15",
+    "city": "Kaunas",
+    "zip": "6010",
+    "country": "Lithuania",
+    "checkin": "2022-05-10",
+    "checkout": "2022-05-12"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+content-type: application/json
+
+{
+    "code": "..."
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+content-type: application/json
+
+{
+    "code": "...",
+    "name": "John Doe"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+content-type: application/json
+
+{
+    "code": "554X2G9PEBQ",
+    "name": "John Doe"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations/123/cancel HTTP/1.1
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations/123/cancel HTTP/1.1
+content-type: application/json
+
+{
+    "code": "UH754I2UXQY",
+    "name": "John Doe"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+content-type: application/json
+
+{
+    "code": "123",
+    "name": "John Doe"
+}
+
+###
+
+POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+content-type: application/json
+
+{
+    "code": "UH754I2UXQY",
+    "name": "John Doe"
+}

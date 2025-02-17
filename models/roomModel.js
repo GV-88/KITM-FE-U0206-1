@@ -3,6 +3,11 @@ const mongoose = require("mongoose");
 const roomSchema = new mongoose.Schema(
 	{
 		// id is int in API specification, but I guess mongodb string will be ok?
+		// _id: {
+		// 	type: mongoose.ObjectId,
+		// 	select: true,
+		// 	alias: "id",
+		// },
 		number: {
 			type: Number,
 			required: [true, "room number is required"],
@@ -18,6 +23,7 @@ const roomSchema = new mongoose.Schema(
 		},
 		price: {
 			type: Number,
+			min: [0, "room price cannot be negative"],
 		},
 		wifi: {
 			type: Boolean,
@@ -37,10 +43,25 @@ const roomSchema = new mongoose.Schema(
 	{
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
+		virtuals: {
+			// id: {
+			// 	get() {
+			// 		return this._id;
+			// 	},
+			// },
+			reservations: { ref: "Reservation", foreignField: "room", localField: "_id" },
+		},
 	}
 );
 
-// roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", localField: "_id" });
+//why won't this work???
+roomSchema.pre(/^find/, function (next) {
+	// this.populate({
+	// 	path: "reservations",
+	// 	select: "room _id checkin checkout",
+	// });
+	next();
+});
 
 const Room = mongoose.model("Room", roomSchema);
 

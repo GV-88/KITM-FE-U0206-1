@@ -10,12 +10,14 @@ const formatRoomResponse = (roomData) => {
 
 exports.getAllRooms = async (req, res) => {
 	try {
-		let rooms = await Room.find();
+		let rooms = await Room.find().sort("number"); //API spec says sort by name, there is no such field???
 		rooms = rooms.map((room) => formatRoomResponse(room));
 		res.status(200).json({ rooms });
 	} catch (error) {
+		console.log(error);
+
 		res.status(404).json({
-			message: error,
+			error: error,
 		});
 	}
 };
@@ -24,12 +26,13 @@ exports.getAllRooms = async (req, res) => {
 
 exports.getSingleRoom = async (req, res) => {
 	try {
-		let room = await Room.findById(req.params.id);
-		room = formatRoomResponse(room);
+		console.log(req.params);
+
+		const room = formatRoomResponse(await Room.findById(req.params["room_id"]));
 		res.status(200).json({ room });
 	} catch (error) {
 		res.status(404).json({
-			message: error,
+			error: "A room with this ID does not exist",
 		});
 	}
 };
