@@ -3,11 +3,6 @@ const mongoose = require("mongoose");
 const roomSchema = new mongoose.Schema(
 	{
 		// id is int in API specification, but I guess mongodb string will be ok?
-		// _id: {
-		// 	type: mongoose.Schema.Types.ObjectId,
-		// 	select: true,
-		// 	alias: "id",
-		// },
 		number: {
 			type: Number,
 			required: [true, "room number is required"],
@@ -46,15 +41,17 @@ const roomSchema = new mongoose.Schema(
 	}
 );
 
+//WHY doesn't it work the same when put in schema declaration???
+
 roomSchema.virtual("reservations", { ref: "Reservation", foreignField: "room", localField: "_id" });
 
-roomSchema.static("populateReservations", function () {
+roomSchema.query.populateReservations = function () {
 	//returns self (chainable)
 	return this.populate({
 		path: "reservations",
 		select: "_id checkin checkout -created_at -room",
 	});
-});
+};
 
 const Room = mongoose.model("Room", roomSchema);
 

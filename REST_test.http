@@ -1,17 +1,20 @@
-
-GET http://localhost:8000/module-b/api/v1/rooms HTTP/1.1
-
-###
-
-GET http://localhost:8000/module-b/api/v1/rooms/67ae138b899f504004c231db HTTP/1.1
+@url = http://localhost:8000/module-b/api/v1
 
 ###
-
-GET http://localhost:8000/module-b/api/v1/rooms/availability/checkin/2022-05-11/checkout/2022-05-14 HTTP/1.1
+# list rooms
+GET {{url}}/rooms HTTP/1.1
 
 ###
+# get single room
+GET {{url}}/rooms/67ae138b899f504004c231db HTTP/1.1
 
-POST http://localhost:8000/module-b/api/v1/rooms/67ae138b899f504004c231db/reservation HTTP/1.1
+###
+# check availability
+GET {{url}}/rooms/availability/checkin/2022-05-11/checkout/2022-05-14 HTTP/1.1
+
+###
+# make reservation (invalid)
+POST {{url}}/rooms/67ae138b899f504004c231db/reservation HTTP/1.1
 content-type: application/json
 
 {
@@ -19,8 +22,8 @@ content-type: application/json
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/rooms/67b27814899f504004c2b86c/reservation HTTP/1.1
+# make reservation (no code, means new client)
+POST {{url}}/rooms/67b27814899f504004c2b86c/reservation HTTP/1.1
 content-type: application/json
 
 {
@@ -34,12 +37,28 @@ content-type: application/json
 }
 
 ###
+# make reservation (existing code, means existing client)
+POST {{url}}/rooms/67b27814899f504004c2b86c/reservation HTTP/1.1
+content-type: application/json
 
-POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+{
+    "code": "99VPC9XR9WM",
+    "name": "John Doe",
+    "address": "Bees str. 15",
+    "city": "Kaunas",
+    "zip": "6010",
+    "country": "Lithuania",
+    "checkin": "2022-05-10",
+    "checkout": "2022-05-12"
+}
 
 ###
+# list reservations (invalid)
+POST {{url}}/reservations HTTP/1.1
 
-POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+###
+# list reservations (invalid, no name)
+POST {{url}}/reservations HTTP/1.1
 content-type: application/json
 
 {
@@ -47,8 +66,8 @@ content-type: application/json
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+# list reservations (non-existing code)
+POST {{url}}/reservations HTTP/1.1
 content-type: application/json
 
 {
@@ -57,26 +76,26 @@ content-type: application/json
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/reservations HTTP/1.1
+# list reservations (by existing code)
+POST {{url}}/reservations HTTP/1.1
 content-type: application/json
 
 {
-    "code": "554X2G9PEBQ",
+    "code": "99VPC9XR9WM",
     "name": "John Doe"
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/reservations/123/cancel HTTP/1.1
-
-###
-
-POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+# cancel reservation (non-existing id)
+POST {{url}}/reservations/123/cancel HTTP/1.1
 
 ###
+# cancel reservation (no auth)
+POST {{url}}/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
 
-POST http://localhost:8000/module-b/api/v1/reservations/123/cancel HTTP/1.1
+###
+# cancel reservation (non-existing id)
+POST {{url}}/reservations/123/cancel HTTP/1.1
 content-type: application/json
 
 {
@@ -85,8 +104,8 @@ content-type: application/json
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+# cancel reservation (non-existing code)
+POST {{url}}/reservations/67b9a78559e75f2e5791ba5d/cancel HTTP/1.1
 content-type: application/json
 
 {
@@ -95,11 +114,11 @@ content-type: application/json
 }
 
 ###
-
-POST http://localhost:8000/module-b/api/v1/reservations/67b29060f7d49dfca7cca846/cancel HTTP/1.1
+# cancel reservation
+POST {{url}}/reservations/67b9a78559e75f2e5791ba5d/cancel HTTP/1.1
 content-type: application/json
 
 {
-    "code": "UH754I2UXQY",
+    "code": "YFN46ND6GLR",
     "name": "John Doe"
 }

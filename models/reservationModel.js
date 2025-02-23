@@ -6,8 +6,33 @@ const required = (fieldName = "{PATH}") => {
 	return [true, `${fieldName} is required`];
 };
 
+const populateRoomInfo = (obj) => {
+	//returns obj (chainable when wrapped with "this")
+	return obj.populate({
+		path: "room",
+		select: "number",
+	});
+};
+
+const populateClientInfo = (obj) => {
+	//returns obj (chainable when wrapped with "this")
+	return obj.populate({
+		path: "client",
+		select: "name",
+	});
+};
+
+// there is reason to store reservations as subdocs within HotelClient;
+// that would prevent anomalous orphan reservations, like SQL cascade does;
+// on the other hand, there is need to query reservations independently from clients;
 const reservationSchema = new mongoose.Schema(
 	{
+		client: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "HotelClient",
+			required: [true, "reservation must be connected to a client"],
+			select: false,
+		},
 		room: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Room",
@@ -18,30 +43,6 @@ const reservationSchema = new mongoose.Schema(
 			required: required("reservation code"),
 			unique: true,
 			default: generateCode(10), //when will this function be called? //also, should we ensure unique in db with retry loop?
-		},
-		name: {
-			type: String,
-			required: required("reservation name"),
-		},
-		address: {
-			type: String,
-			required: required(),
-			select: false,
-		},
-		city: {
-			type: String,
-			required: required(),
-			select: false,
-		},
-		zip: {
-			type: String,
-			required: required("zip code"),
-			select: false,
-		},
-		country: {
-			type: String,
-			required: required(),
-			select: false,
 		},
 		checkin: {
 			type: Date,
@@ -69,30 +70,26 @@ const reservationSchema = new mongoose.Schema(
 	{
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
-		// virtuals: {
-		// 	reservation_information: {
-		// 		get() {
-		// 			return {
-		// 				id: this._id,
-		// 				checkin: this.checkin,
-		// 				checkout: this.checkout,
-		// 				room: this.room,
-		// 			};
-		// 		},
-		// 	},
-		// },
+		// methods can be used on a document object
+		methods: {
+			populateRoomInfo() {
+				return populateRoomInfo(this);
+			},
+			populateClientInfo() {
+				return populateClientInfo(this);
+			},
+		},
+		// query helpers can be used on a query chain
+		query: {
+			populateRoomInfo() {
+				return populateRoomInfo(this);
+			},
+			populateClientInfo() {
+				return populateClientInfo(this);
+			},
+		},
 	}
 );
-
-reservationSchema.pre(/^find/, function (next) {
-	this.populate({
-		path: "room",
-		select: "number", // need _id field for populating, but not for display
-		//select: "-reservations",
-		// cannot exclude virtual "reservations"???
-	});
-	next();
-});
 
 const Reservation = mongoose.model("Reservation", reservationSchema);
 
