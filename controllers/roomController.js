@@ -1,4 +1,5 @@
 const Room = require("../models/roomModel");
+const Reservation = require("../models/reservationModel");
 
 const formatRoomResponse = (roomData) => {
 	const res = Object.assign({ id: roomData._id.toString() }, roomData._doc);
@@ -34,18 +35,41 @@ exports.getRooms = async (req, res) => {
 };
 
 // this depends on room-reservation relation, cannot implement until virtuals are solved
-exports.checkAvailability = async (req, res, next) => {
-	try {
-		// objective: find rooms that do not have reservations with intersecting dates
-		// rooms without any reservations are clear
-		// will need at some point to populate reservations to then be able to filter rooms by dates
-		// mongoose docs: "Paths are populated after the query executes and a response is received"
-		// so it seems the narrowing won't be done entirely on db end, will have to download intermediary results
+exports.getAvailableRooms = async (req, res) => {
+	const checkinDate = Date.parse(req.params["checkin_date"]);
+	const checkoutDate = Date.parse(req.params["checkout_date"]);
+	if (isNaN(checkinDate)) {
+		res.status(404).json({
+			error: "Bad checkin date format or date not provided",
+		});
+		return;
+	}
+	if (isNaN(checkoutDate)) {
+		res.status(404).json({
+			error: "Bad checkout date format or date not provided",
+		});
+		return;
+	}
+	if (isNaN(checkinDate) || isNaN(checkoutDate) || checkinDate > checkoutDate) {
+		res.status(400).json({
+			error: "invalid date range",
+		});
+		return;
+	}
 
-		throw new Error("not implemented yet");
-		if (typeof next === "function") {
-			next();
-		}
+	try {
+		// 1. get distinct room IDs of reservations that intersect given date range
+		// 2. get all rooms and subtract those found previously
+		// not scalable if hotel is large and densely occupied
+		// maybe doable in single db request with lookup pipelines
+		const occupiedRooms = await Reservation.find({
+			$or: [{ checkin: { $gte: checkinDate, $lte: checkoutDate } }, { checkout: { $gte: checkinDate, $lte: checkoutDate } }],
+		}).distinct("room");
+		const availableRooms = await Room.find({ _id: { $nin: occupiedRooms } }).select("number");
+
+		res.status(200).json({
+			rooms: availableRooms.map((room) => ({ id: room.id, number: room.number, availability: true })),
+		});
 	} catch (error) {
 		res.status(400).json({
 			error: error.message,

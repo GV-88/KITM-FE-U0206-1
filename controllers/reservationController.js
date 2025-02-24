@@ -59,9 +59,7 @@ exports.checkCredentials = async (req, res, next) => {
 	if (req.body?.name && req.body?.code) {
 		next();
 	} else {
-		res.status(401).json({
-			error: "Unauthorized",
-		});
+		res.status(401).json({ error: "Unauthorized" });
 	}
 };
 
@@ -77,9 +75,7 @@ exports.checkRoom = async (req, res, next) => {
 	if (room) {
 		next();
 	} else {
-		res.status(404).json({
-			error: "A room with this ID does not exist",
-		});
+		res.status(404).json({ error: "A room with this ID does not exist" });
 	}
 };
 
@@ -100,9 +96,7 @@ exports.getReservations = async (req, res) => {
 			.populate({ path: "client", match: { name: name } });
 
 		if (!resByClient?.client) {
-			res.status(401).json({
-				error: "Unauthorized",
-			});
+			res.status(401).json({ error: "Unauthorized" });
 			return;
 		}
 
@@ -113,9 +107,7 @@ exports.getReservations = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 
-		res.status(500).json({
-			error: error,
-		});
+		res.status(500).json({ error: error });
 	}
 };
 
@@ -139,9 +131,7 @@ exports.createReservation = async (req, res) => {
 		} else {
 			clientId = (await Reservation.findOne({ code: code }).select("client"))?.client?._id;
 			if (!clientId) {
-				res.status(401).json({
-					error: "Unauthorized",
-				});
+				res.status(401).json({ error: "Unauthorized" });
 				return;
 			}
 			await HotelClient.findByIdAndUpdate(clientId, req.body);
@@ -175,9 +165,7 @@ exports.createReservation = async (req, res) => {
 			}
 		}
 
-		res.status(500).json({
-			error: error,
-		});
+		res.status(500).json({ error: error });
 	}
 };
 
@@ -193,19 +181,14 @@ exports.cancelReservation = async (req, res) => {
 		const deletedRes = await Reservation.findOneAndDelete({ _id: reservationId, code: code });
 		if (deletedRes) {
 			res.status(204).json({ message: "success" });
-			return;
 		} else {
 			// due to single statement findOneAndDelete, impossible to tell what exactly was wrong
 			res.status(404).json({
 				error: "A reservation with this ID does not exist", //or possibly, exists but does not match credentials
 			});
 		}
-
-		const res = await Reservation.findById(reservationId);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({
-			error: error,
-		});
+		res.status(500).json({ error: error });
 	}
 };
